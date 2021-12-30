@@ -17,15 +17,6 @@ h2, h1{
   margin-bottom: 3px;
 }
 
-div#container {
-  position: relative;
-  margin: 0 auto 0 auto;
-  max-width: 40em;
-  padding: 1em 1.5em 1.3em 1.5em;
-  border: 2px solid grey;
-  
-}
-
 video {
   background: #222;
   margin: 0 0 0 0;
@@ -34,20 +25,20 @@ video {
   height: calc(var(--width) * 0.75);
 }
 
-#question{
-  background-color: azure;
-  padding-left: 25px;
-  margin-top: 0px;
-  border: 1px solid black;
+#recPart {
+  display: flex;
 }
 
 #rec{
   position: absolute;
-  right: 45px;
-  top: 30px;
+  right: 10px;
+  top: 10px;
+  padding: 5px;
   display: flex;
+  flex-direction:column ;
   align-items: center;
   color: white;
+  border: 3px solid white;
 }
 
 #point{
@@ -58,108 +49,13 @@ video {
   border-radius: 50%;
 }
 
-#move{
-  padding-left: 25px;
-  padding-right: 25px;
-  display: flex;
-  justify-content: center;
-}
-
-#play{
-  height: 45px;
-  width: 45px;
-  background: grey;
-  border: none;
-  border-radius: 50%;
-  position: absolute;
-  bottom: 107px;
-  right: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#play:hover {
-  background: black;
-}
-
-#record {
-  width: 90px;
-  height: 40px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  color: white;
-  font-weight: bold;
-  border-radius: 12px;
-  background-color: #4bb543;
-  border: none;
-  margin-top: 10px;
-}
-
-#record:hover {
-  background-color: green;
-}
-
-#home {
-  display: flex;
-  justify-content: center;
-  margin: 10px;
-}
-
-.next {
-  font-weight: bold;
-  height: 50px;
-  width: 100px;
-  margin: 15px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.back {
-  font-weight: bold;
-  height: 50px;
-  width: 100px;
-  margin: 15px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-}
-
-.btnHome {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  width: 150px;
-}
-
 .principal{
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.main_container {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 55px;
-}
-
 .screen {
   height: 280px;
   background-color: black;
-}
-
-.completed {
-  padding: 15px;
-  text-align: right;
-  color: green;
-  font-weight: bold;
-}
-
-.missing {
-  padding: 15px;
-  text-align: right;
-  color: red;
-  font-weight: bold;
 }

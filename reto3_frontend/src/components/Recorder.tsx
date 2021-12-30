@@ -1,25 +1,61 @@
 import { useEffect, useRef, useState } from 'react';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import { useQuery } from '@apollo/client';
-import { QUESTION } from '../interfaces/index';
-import Status from './Status';
+import {
+  Box, Button, Card, IconButton,
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import DoneIcon from '@mui/icons-material/Done';
+import Timer from './Timer';
 
-const Recorder = ({ question }: any) => {
-  const { data } = useQuery(QUESTION, { variables: { nro: question } });
+const useStyles = makeStyles({
+
+  container: {
+    position: 'relative',
+  },
+  play: {
+    borderRadius: '50%',
+    height: '45px',
+    width: '45px',
+    background: 'black',
+    marginTop: '10px',
+  },
+  control: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: '20px',
+    marginRight: '10px',
+  },
+  question: {
+    backgroundColor: 'azure',
+    paddingLeft: '25px',
+    marginTop: '0px',
+    border: '1px solid black',
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
+  status: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: '15px',
+  },
+});
+
+const Recorder = ({ question, index }: any) => {
   const [status, setStatus] = useState(false);
   const [videos, setVideos] = useState({});
   const [src, setSrc] = useState('');
-  const [error, setError] = useState(false);
-  const [messageError, setMessageError] = useState('');
   const [btnRecord, setBtnRecord] = useState(false);
-  const [recorded, setRecorded] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<any>();
   const [recordedBlobs, setrecordedBlobs] = useState<any[]>([]);
 
   const ref = useRef<any|null>(null);
   const refButton = useRef<any|null>(null);
   const refRecord = useRef<any|null>(null);
+
+  const classes = useStyles();
 
   const handleSuccess = (stream: MediaStream | null) => {
     window.stream = stream;
@@ -30,10 +66,8 @@ const Recorder = ({ question }: any) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       handleSuccess(stream);
-      setError(false);
     } catch (e:any) {
-      setError(true);
-      setMessageError(`navigator.getUserMedia error:${e.toString()}`);
+      console.log(e);
     }
   }
 
@@ -48,30 +82,17 @@ const Recorder = ({ question }: any) => {
   function startRecording() {
     setrecordedBlobs([]);
     const options = { mimeType: 'video/webm;codecs=vp9,opus' };
-    // console.log('Desde start Recording Options', options);
     let mediaRecorderInit:any;
     try {
-      // console.log('Crea un media recorder instancia');
       mediaRecorderInit = new MediaRecorder(window.stream, options);
       setMediaRecorder(mediaRecorderInit);
-      setError(false);
     } catch (e) {
-      // console.error('Exception while creating MediaRecorder:', e);
-      setError(true);
-      setMessageError(`Exception while creating MediaRecorder: ${JSON.stringify(e)}`);
       return;
     }
-
-    // console.log('Created MediaRecorder', mediaRecorderInit, 'with options', options);
-
     refRecord.current.textContent = 'Stop Recording';
-    mediaRecorderInit.onstop = (event) => {
-      // console.log('Recorder stopped: ', event);
-      // console.log('Recorded Blobs: ', recordedBlobs);
-    };
+    mediaRecorderInit.onstop = (event) => { /*  */ };
     mediaRecorderInit.ondataavailable = handleDataAvailable;
     mediaRecorderInit.start();
-    // console.log('MediaRecorder started', mediaRecorderInit);
   }
 
   function stopRecording() {
@@ -102,9 +123,11 @@ const Recorder = ({ question }: any) => {
       refButton.current.controls = true;
       refButton.current.play();
     } else {
+      const elemnts = window.localStorage.getItem('videos') || '[]';
+      const videos = JSON.parse(elemnts);
       refButton.current.src = null;
       refButton.current.srcObject = null;
-      refButton.current.src = src;
+      refButton.current.src = videos[index];
       refButton.current.controls = true;
       refButton.current.play();
     }
@@ -127,7 +150,7 @@ const Recorder = ({ question }: any) => {
       const mimeType = 'video/webm';
       const superBuffer = new Blob(recordedBlobs, { type: mimeType });
       const url = window.URL.createObjectURL(superBuffer);
-      const videos_ = { ...videos, [String(question)]: url };
+      const videos_ = { ...videos, [index]: url };
       window.localStorage.setItem('videos', JSON.stringify(videos_));
       setStatus(true);
     }
@@ -136,57 +159,81 @@ const Recorder = ({ question }: any) => {
   useEffect(() => {
     _handleActiveCamare();
 
-    const elemnts = window.localStorage.getItem('videos') || '{}';
+    refButton.current.src = null;
+    const elemnts = window.localStorage.getItem('videos') || '[]';
     const videos = JSON.parse(elemnts);
     setVideos(videos);
-    if (videos[String(question)]) {
-      ref.current.hidden = true;
+    if (videos[index]) {
       refButton.current.hidden = false;
+      ref.current.hidden = true;
       setStatus(true);
-      setSrc(videos[String(question)]);
+      setSrc(videos[index]);
     } else {
       setStatus(false);
       setSrc('');
       ref.current.hidden = false;
       refButton.current.hidden = true;
     }
-  }, [question]);
+  }, [index, question]);
 
   return (
-    <div id="container">
-      {
-        btnRecord
-            && (
-            <div id="rec">
-              <div>[</div>
-              <div id="point" />
-              <div>REC]</div>
-            </div>
-            )
-      }
-      <video id="gum" ref={ref} playsInline autoPlay muted />
-      <video id="recorded" ref={refButton} playsInline />
-      {
-        data && (
-          <div id="question">
-            <p>{ data.findPregunta.pregunta }</p>
-          </div>
-        )
-      }
-      <button id="record" onClick={_handleRecord} ref={refRecord}>
-        <RadioButtonCheckedIcon sx={{ color: 'red' }} />
-        Grabar
-      </button>
-      {
-        status && (
-        <button id="play" onClick={_handlePlayRecord}>
-          <PlayArrowIcon sx={{ fontSize: 30, color: 'white' }} />
-        </button>
-        )
+    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+      <Card
+        className={classes.container}
+        sx={{
+          width: 700,
+          height: 525,
+        }}
+      >
+
+        {
+          btnRecord && <Timer pausa={refRecord} />
         }
 
-      <Status status={status} />
-    </div>
+        <video id="recorded" ref={refButton} playsInline />
+        <video id="gum" ref={ref} playsInline autoPlay muted />
+
+        <div className={classes.question}>
+          <p>{ question }</p>
+          {
+            status && (
+              <div className={classes.status}>
+                <DoneIcon sx={{
+                  color: 'green',
+                }}
+                />
+              </div>
+            )
+          }
+        </div>
+
+        <div className={classes.control}>
+          {
+          status
+          && (
+          <IconButton className={classes.play} onClick={_handlePlayRecord}>
+            <PlayArrowIcon sx={{ fontSize: 30, color: 'darkgrey' }} />
+          </IconButton>
+          )
+          }
+
+          <Button
+            onClick={_handleRecord}
+            ref={refRecord}
+            variant="outlined"
+            sx={{ margin: '10px', marginBottom: '10px' }}
+            startIcon={(
+              <RadioButtonCheckedIcon
+                sx={{ color: 'red' }}
+              />
+            )}
+          >
+            Grabar
+          </Button>
+        </div>
+
+      </Card>
+    </Box>
   );
 };
 

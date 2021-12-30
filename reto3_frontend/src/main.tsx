@@ -1,9 +1,9 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import {
   ApolloClient, ApolloProvider, InMemoryCache, HttpLink,
 } from '@apollo/client';
+import { StyledEngineProvider } from '@mui/material/styles';
 import Root from './routes/index';
 
 const client = new ApolloClient({
@@ -14,8 +14,10 @@ const client = new ApolloClient({
 });
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
-    <Root />
-  </ApolloProvider>,
+  <StyledEngineProvider injectFirst>
+    <ApolloProvider client={client}>
+      <Root />
+    </ApolloProvider>
+  </StyledEngineProvider>,
   document.getElementById('root'),
 );

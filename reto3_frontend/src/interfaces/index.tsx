@@ -6,18 +6,21 @@ export interface FormValues {
   password: string;
 }
 
-export const Preguntas = {
-  1: 'Porque elegiste la programacion 1',
-  2: 'Porque elegiste la programacion 2',
-  3: 'Porque elegiste la programacion 3',
-  4: 'Porque elegiste la programacion 4',
-  5: 'Porque elegiste la programacion 5',
-  6: 'Porque elegiste la programacion 6',
-  7: 'Porque elegiste la programacion 7',
-  8: 'Porque elegiste la programacion 8',
-  9: 'Porque elegiste la programacion 9',
-  10: 'Porque elegiste la programacion 10',
-};
+export interface statusProps {
+  status: boolean;
+}
+
+export interface Pregunta {
+  id: string;
+  nro : number;
+  pregunta: string;
+}
+
+export interface CardPregunta {
+  pregunta: string;
+  indice: number;
+  status: boolean;
+}
 
 export const ALL_QUESTIONS = gql`
   query {
